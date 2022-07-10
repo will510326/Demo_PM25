@@ -1,15 +1,34 @@
 const chart1E1 = document.querySelector('#main');
 const chart2E2 = document.querySelector('#six');
+const chart3E3 = document.querySelector('#county');
+
 
 const pm25HighSite = document.querySelector("#pm25_high_site");
 const pm25HighValue = document.querySelector("#pm25_high_value");
 const pm25LowSite = document.querySelector("#pm25_low_site");
 const pm25LowValue = document.querySelector("#pm25_low_value");
 
+
+$('#county_btn').click(()=>{
+    let city = $("#select_county").val();
+    drawCityPM25(city);
+});
+
 let chart1 = echarts.init(chart1E1);
 let chart2 = echarts.init(chart2E2);
+let chart3 = echarts.init(chart3E3);
+
+
+window.onresize = function(){
+        chart1.resize();
+        chart2.resize();
+        chart3.resize();
+    };
+
 $(document).ready(() => {
     drawPM25();
+    drawSixPM25();
+    drawCityPM25('臺東縣');
 }); //網頁整個渲染後才執行內部函式
 
 function rendyMaxPM25(data) {
@@ -36,7 +55,6 @@ function drawSixPM25() {
         dataType: "json",
         success: (data) => {
             chart2.hideLoading();
-            console.log(data);
             drawChart2(data);
 
         },
@@ -84,7 +102,63 @@ function drawSixPM25() {
         option && chart2.setOption(option);
     }
 }
+//繪製每個縣市的function
+function drawCityPM25(city) {
+    chart3.showLoading(); //顯示Loading畫面
+    $.ajax({
+        url: `/city-pm25/${city}`,
+        type: "POST",
+        dataType: "json",
+        success: (data) => {
+            chart3.hideLoading();
+            console.log(data);
+            drawChart3(data);
+        },
+        error: () => {
+            chart3.hideLoading();
+            alert(`${city}資料讀取失敗！！`);
+        }
+    });
 
+
+    function drawChart3(data) {
+
+        var option;
+
+        option = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['PM2.5']
+            },
+
+
+            xAxis: {
+                type: 'category',
+                data: data['stationName']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                itemStyle: {
+                    color: '#7fffd4'
+                },
+                name: 'PM2.5', // 可以將指標移動到想看的柱狀顯示資訊
+                data: data['result'],
+                type: 'bar',
+                showBackground: true,
+                backgroundStyle: {
+                    color: 'rgba(180, 180, 180, 0.2)'
+                },
+
+            }]
+        };
+
+        option && chart3.setOption(option);
+    }
+}
 //繪畫全台的function
 function drawPM25() {
     //數值初始化

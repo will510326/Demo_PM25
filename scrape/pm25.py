@@ -1,3 +1,4 @@
+from matplotlib.pyplot import get
 import pandas as pd
 import ssl
 
@@ -7,7 +8,19 @@ url = 'https://sta.ci.taiwan.gov.tw/STA_AirQuality_v2/v1.0/Datastreams?$expand=T
 
 df = None
 
-# citys = [] result = []
+
+def get_county_pm25(city):
+    global df
+    datas = df.groupby('city').get_group(city)[
+        ['stationName', 'result']].values
+    stationName = [data[0] for data in datas]
+    result = [data[1] for data in datas]
+    return stationName, result
+
+
+def get_citys():
+    global df
+    return list(set(df['city']))
 
 
 def get_six_pm25():
@@ -48,6 +61,9 @@ def get_pm25(sort=False, show=False):
     return columns, values
 
 
+get_pm25()
 if __name__ == '__main__':
     get_pm25()
     print(get_six_pm25())
+    print(get_citys())
+    print(get_county_pm25('新北市'))
