@@ -1,0 +1,61 @@
+body {
+    background-color: beige;
+}
+
+#container {
+    width: 80%;
+    text-align: center;
+    margin: 16px auto;
+}
+
+table {
+    width: 60%;
+    margin: 0 auto;
+}
+
+th {
+    background-color: blueviolet;
+    color: white;
+}
+
+td {
+    background-color: rgb(253, 216, 202);
+}
+
+td:first-child {
+    background-color: chartreuse;
+}
+
+td:nth-child(3) {
+    background-color: tomato;
+    color: white;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+input[type="submit"] {
+    margin: 6px 0px;
+    background-color: cadetblue;
+    color: aliceblue;
+    width: 80px;
+    height: 30px;
+    border-radius: 6px;
+}
+
+@media screen and (max-width:1024px) {
+    #container {
+        width: 100%;
+    }
+
+    table {
+        width: 90%;
+    }
+}
+
+.time {
+    background-color: black;
+    color: yellow;
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: inline-block;
+}
