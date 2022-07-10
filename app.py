@@ -24,7 +24,7 @@ def get_pm25_json():
 
 @app.route('/pm25-chart')
 def pm25_chart():
-    return render_template("pm25-chart.html")
+    return render_template("pm25-charts-bulma.html")
 
 
 @app.route('/pm25', methods=['GET', 'POST'])
