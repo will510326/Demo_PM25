@@ -1,8 +1,14 @@
 from flask import Flask, render_template, request
 from datetime import datetime
 import json
-from scrape.pm25 import get_pm25
+from scrape.pm25 import get_pm25, get_six_pm25
 app = Flask(__name__)
+
+
+@app.route('/six-pm25-json', methods=['POST'])
+def get_six_json():
+    citys, results = get_six_pm25()
+    return json.dumps({'citys': citys, 'results': results}, ensure_ascii=False)
 
 
 @app.route('/pm25-json', methods=['POST'])

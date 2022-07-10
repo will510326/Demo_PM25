@@ -1,10 +1,13 @@
 const chart1E1 = document.querySelector('#main');
+const chart2E2 = document.querySelector('#six');
+
 const pm25HighSite = document.querySelector("#pm25_high_site");
 const pm25HighValue = document.querySelector("#pm25_high_value");
 const pm25LowSite = document.querySelector("#pm25_low_site");
 const pm25LowValue = document.querySelector("#pm25_low_value");
 
 let chart1 = echarts.init(chart1E1);
+let chart2 = echarts.init(chart2E2);
 $(document).ready(() => {
     drawPM25();
 }); //網頁整個渲染後才執行內部函式
@@ -24,7 +27,65 @@ function rendyMaxPM25(data) {
 
     console.log(maxIndex, minIndex)
 }
+//繪製六都function
+function drawSixPM25() {
+    chart2.showLoading();
+    $.ajax({
+        url: "/six-pm25-json",
+        type: "POST",
+        dataType: "json",
+        success: (data) => {
+            chart2.hideLoading();
+            console.log(data);
+            drawChart2(data);
 
+        },
+        error: () => {
+            chart2.hideLoading();
+            alert("六都資料讀取失敗！！");
+        }
+    });
+
+    function drawChart2(data) {
+
+        var option;
+
+        option = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['PM2.5']
+            },
+
+
+            xAxis: {
+                type: 'category',
+                data: data['citys']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                itemStyle: {
+                    color: '#7fffd4'
+                },
+                name: 'PM2.5', // 可以將指標移動到想看的柱狀顯示資訊
+                data: data['results'],
+                type: 'bar',
+                showBackground: true,
+                backgroundStyle: {
+                    color: 'rgba(180, 180, 180, 0.2)'
+                },
+
+            }]
+        };
+
+        option && chart2.setOption(option);
+    }
+}
+
+//繪畫全台的function
 function drawPM25() {
     //數值初始化
     pm25HighSite.innerText = "N/A";
@@ -41,6 +102,7 @@ function drawPM25() {
             console.log(data);
             drawChart1(data);
             rendyMaxPM25(data);
+            drawSixPM25();
             $('#date').text(data["time"]) //get time data for pm25-chart.html
         },
         error: () => {
@@ -102,108 +164,6 @@ function drawPM25() {
                 }
             }]
         };
-
-        option && chart1.setOption(option);
-    }
-
-    function drawTest(datas) {
-        var option;
-
-        // prettier-ignore
-        let dataAxis = datas['stationName'];
-        // prettier-ignore
-        let data = datas['result'];
-        let yMax = 500;
-        let dataShadow = [];
-        for (let i = 0; i < data.length; i++) {
-            dataShadow.push(yMax);
-        }
-        option = {
-            title: {
-                text: '特性示例：渐变色 阴影 点击缩放',
-                subtext: 'Feature Sample: Gradient Color, Shadow, Click Zoom'
-            },
-            xAxis: {
-                data: dataAxis,
-                axisLabel: {
-                    inside: true,
-                    color: '#000'
-                },
-                axisTick: {
-                    show: false
-                },
-                axisLine: {
-                    show: false
-                },
-                z: 10
-            },
-            yAxis: {
-                axisLine: {
-                    show: false
-                },
-                axisTick: {
-                    show: false
-                },
-                axisLabel: {
-                    color: '#999'
-                }
-            },
-            dataZoom: [{
-                type: 'inside'
-            }],
-            tooltip: {},
-            legend: {
-                data: ['PM2.5']
-            },
-            series: [{
-                name: 'PM2.5',
-                type: 'bar',
-                showBackground: true,
-                itemStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                            offset: 0,
-                            color: '#00fa9a'
-                        },
-                        {
-                            offset: 0.5,
-                            color: '#7fffd4'
-                        },
-                        {
-                            offset: 1,
-                            color: '#ffff00'
-                        }
-                    ])
-                },
-                emphasis: {
-                    itemStyle: {
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                offset: 0,
-                                color: '#2378f7'
-                            },
-                            {
-                                offset: 0.7,
-                                color: '#2378f7'
-                            },
-                            {
-                                offset: 1,
-                                color: '#83bff6'
-                            }
-                        ])
-                    }
-                },
-                data: data
-            }]
-        };
-        // Enable data zoom when user click bar.
-        const zoomSize = 6;
-        chart1.on('click', function (params) {
-            console.log(dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)]);
-            chart1.dispatchAction({
-                type: 'dataZoom',
-                startValue: dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)],
-                endValue: dataAxis[Math.min(params.dataIndex + zoomSize / 2, data.length - 1)]
-            });
-        });
 
         option && chart1.setOption(option);
     }
