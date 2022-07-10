@@ -1,12 +1,37 @@
 const chart1E1 = document.querySelector('#main');
+const pm25HighSite = document.querySelector("#pm25_high_site");
+const pm25HighValue = document.querySelector("#pm25_high_value");
+const pm25LowSite = document.querySelector("#pm25_low_site");
+const pm25LowValue = document.querySelector("#pm25_low_value");
+
 let chart1 = echarts.init(chart1E1);
 $(document).ready(() => {
     drawPM25();
-});//網頁整個渲染後才執行內部函式
+}); //網頁整個渲染後才執行內部函式
 
+function rendyMaxPM25(data) {
+    console.log(data);
+    let stationName = data['stationName'];
+    let result = data['result']
+
+    let maxIndex = result.indexOf(Math.max(...result)); //找最大值的位置
+    let minIndex = result.indexOf(Math.min(...result)); //找最小值位置
+
+    pm25HighSite.innerText = stationName[maxIndex];
+    pm25HighValue.innerText = result[maxIndex];
+    pm25LowSite.innerText = stationName[minIndex];
+    pm25LowValue.innerText = result[minIndex];
+
+    console.log(maxIndex, minIndex)
+}
 
 function drawPM25() {
-    chart1.showLoading();//顯示Loading畫面
+    //數值初始化
+    pm25HighSite.innerText = "N/A";
+    pm25HighValue.innerText = 0;
+    pm25LowSite.innerText = "N/A";
+    pm25LowValue.innerText = 0;
+    chart1.showLoading(); //顯示Loading畫面
     $.ajax({
         url: "/pm25-json",
         type: "POST",
@@ -15,8 +40,10 @@ function drawPM25() {
             chart1.hideLoading();
             console.log(data);
             drawChart1(data);
+            rendyMaxPM25(data);
+            $('#date').text(data["time"]) //get time data for pm25-chart.html
         },
-        error:()=>{
+        error: () => {
             chart1.hideLoading();
             alert("資料讀取失敗！！");
         }
